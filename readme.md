@@ -2,4 +2,4 @@
 
 ## What's this?
 
-These are common routines and other pieces of [golang](http://golang.org/) software that I commonly use.
+These are [golang](http://golang.org/) packages that capture code that I repeatedly use.
