@@ -85,6 +85,10 @@ type Options struct {
 // Only entry point to the package
 // It computes the urlness and returns the matrix and the list (if possible)
 // It retuns the data in matrix and the list as a slice of bytes
+//
+// This is the basic approach, per each individual, make sure the relateness
+// against all the other individuals is below or equal the phi score provided
+// by the user
 func Compute(o Options) (string, string) {
 	var m Samples // Map of samples and its relation ships
 	m.Init()      // Prepare data structure for data
