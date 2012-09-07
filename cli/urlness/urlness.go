@@ -19,25 +19,28 @@ var usage = []string{
   "  -ks   : csv file containing phi coefficients per each relation.",
   "",
   "Optional params: ",
-  "  -sex  : csv file containing samples' sex",
-  "  -phe  : csv file containing the gender of the samples",
-  "  -only : only use this sample when filtering by phi score",
-  "  -phi  : maximum phi score allowed between relations",
+  "  -sex     : csv file containing samples' sex",
+  "  -phe     : csv file containing the gender of the samples",
+  "  -only    : only use this sample when filtering by phi score",
+  "  -phi     : maximum phi score allowed between relations",
+  "  -optimal : find the biggest subset of unrelated samples ",
   "",
   "Output:",
   "  stdin : csv matrix of phi coefficients for ALL the samples.",
   "  stdout: If -phi used: csv list of samples that pass the phi score",
   "",
   "Examples:",
-  "$ urlness -ks data/kinship.csv > matrix.csv",
-  "$ urlness -ks data/kinship.csv -phi 0.5 > matrix.csv 2> l.csv",
-  "$ urlness -ks data/kinship.csv -phi 0.5 -sex data/441-Gender.csv -phe data/441-Pheno.csv > m.csv 2> l.csv",
+  "  $ urlness -ks data/kinship.csv > matrix.csv",
+  "  $ urlness -ks data/kinship.csv -phi 0.5 > matrix.csv 2> l.csv",
+  "  $ urlness -ks data/kinship.csv -phi 0.5 -sex data/441-Gender.csv -phe data/441-Pheno.csv > m.csv 2> l.csv",
+  "  $ urlness -ks data/kinship.csv -phi 0.5 -optimal > list.optimal.csv",
 }
 
 // For processing the input parameters from the user.
 type options struct {
   ksFname, sexFname, pheFname, onlyFname *string
   phiFilter                              *float64
+  optimal                                *bool
 }
 
 func parseArgs() *options {
@@ -47,8 +50,10 @@ func parseArgs() *options {
   o.pheFname = flag.String("phe", "", "Gender csv file.")
   o.onlyFname = flag.String("only", "", "Gender csv file.")
   o.phiFilter = flag.Float64("phi", 0, "Maximum phi coefficient allowed.")
+  o.optimal = flag.Bool("optimal", false, "Enable optimal.")
   flag.Parse()
 
+  // TODO: check that the file exists!!!!!!!!!!!!!!!!!!!!
   err := false
   if len(flag.Args()) != 0 {
     fmt.Fprintln(os.Stderr, "Invalid parameter.")
@@ -62,6 +67,11 @@ func parseArgs() *options {
 
   if *o.onlyFname != "" && *o.phiFilter == 0 {
     fmt.Fprintln(os.Stderr, "ERROR: -only requires -phi param")
+    err = true
+  }
+
+  if *o.optimal && *o.phiFilter == 0 {
+    fmt.Fprintln(os.Stderr, "ERROR: -optimal requires -phi param")
     err = true
   }
 
@@ -98,9 +108,13 @@ func main() {
   // We know the Phi param has to be there for sure
   inputData.PhiFilter = *o.phiFilter
 
-  m, l := urlness.Compute(*inputData) // matrix and list of unrelated samples
-  fmt.Println(m)
-  if *o.phiFilter != 0 {
-    fmt.Fprintln(os.Stderr, l)
+  if *o.optimal {
+    fmt.Println(urlness.ComputeOptimal(*inputData))
+  } else {
+    m, l := urlness.Compute(*inputData) // matrix and list of unrelated samples
+    fmt.Println(m)
+    if *o.phiFilter != 0 {
+      fmt.Fprintln(os.Stderr, l)
+    }
   }
 }
