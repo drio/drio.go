@@ -82,10 +82,31 @@ type Options struct {
 	PhiFilter float64 // What's the filter phi value
 }
 
-// Only entry point to the package
+func ComputeOptimal(o Options) string {
+	var m Samples // Map of samples and its relation ships
+	m.Init()      // Prepare data structure for data
+
+	// Load Kindship data
+	processFile(m, o.KS, func(m Samples, s_line, s_header []string) (error) {
+		return m.AddRelation(s_line)
+	})
+
+	// Prepare a set with all the samples
+	set := make(map[string]bool)
+	for _, e := range m.Ids() { set[e] = true }
+
+	// Call the optimal routine and iterate over the elements in the results
+	final := []string{}
+	for e, _ := range findOptimalSet(set, m, o.PhiFilter) {
+		final = append(final, e)
+	}
+
+	return strings.Join(final, "\n")
+}
+
+// First entry point.
 // It computes the urlness and returns the matrix and the list (if possible)
 // It retuns the data in matrix and the list as a slice of bytes
-//
 // This is the basic approach, per each individual, make sure the relateness
 // against all the other individuals is below or equal the phi score provided
 // by the user
