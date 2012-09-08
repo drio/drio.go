@@ -3,9 +3,9 @@ package main
 import (
   "flag"
   "fmt"
+  "github.com/drio/drio.go/common/files"
   "github.com/drio/drio.go/urlness"
   "io"
-  "log"
   "os"
   "strings"
 )
@@ -87,6 +87,8 @@ func main() {
   o := parseArgs()
   inputData := new(urlness.Options)
 
+  // link between file paths and their locations in the datastructure
+  // that we will pass to the urlness package (inputData)
   fNamesToFiles := map[*string]*io.Reader{
     o.ksFname:   &inputData.KS,
     o.sexFname:  &inputData.Sex,
@@ -94,14 +96,12 @@ func main() {
     o.onlyFname: &inputData.Only,
   }
 
+  // Open the files and set the readers for them in inputData
   for path, reader := range fNamesToFiles {
     if *path != "" {
-      if file, err := os.Open(*path); err != nil {
-        log.Fatal("Error opening csv file: ", path, " err: ", err)
-      } else {
-        *reader = file
-        defer file.Close()
-      }
+      file, r := files.Xopen(*path)
+      *reader = r
+      defer file.Close()
     }
   }
 
