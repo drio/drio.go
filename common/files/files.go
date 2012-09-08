@@ -1,3 +1,4 @@
+//Package files contains some helpers to work with files.
 package files
 
 import (
@@ -11,7 +12,8 @@ import (
   "strings"
 )
 
-// Return an iterator to iterate over lines
+// IterLines returns an iterator (channel) so we can
+// iterate over the lines in a file
 func IterLines(r *bufio.Reader) chan string {
   ch := make(chan string, 10000)
   go func() {
@@ -35,7 +37,11 @@ func IterLines(r *bufio.Reader) chan string {
   return ch
 }
 
-// Smart way (I think) to open a file. It can be compressed. Use "-" to read from stdin
+// Xopen opens a file and retuns a Reader.
+// It works with compressed files by inspecting the
+// file extension.
+// Note I originally read this code in a lh3 snippet:
+// https://github.com/lh3/misc/blob/master/klib.lua#L143
 func Xopen(fName string) (*os.File, *bufio.Reader) {
   var (
     fos *os.File

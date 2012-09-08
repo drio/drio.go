@@ -14,18 +14,23 @@ func (e *DsError) Error() string {
   return fmt.Sprintf("Error: %s", e.What)
 }
 
+// Samples is a map from sample Id to the relations data structure
 type Samples map[string]*Relations
 
+// Relations contains, the phi coefficient against other samples
+// the sex and the associated phenotypes for the animal/sample.
 type Relations struct {
   Phis      map[string]float64
   Sex       string
   PhenoType map[string]float64
 }
 
+// Init allocates memory for our datstructure
 func (s *Samples) Init() {
   *s = make(map[string]*Relations)
 }
 
+// add adds a new sample to the ds.
 func (s *Samples) add(id string) {
   r := new(Relations)
   r.Phis = make(map[string]float64)
@@ -33,6 +38,9 @@ func (s *Samples) add(id string) {
   (*s)[id] = r
 }
 
+// AddRelation adds a new phi score between the two
+// animals. The input is a csv line that has to
+// follow an specific format: sample1, sample2, phi coefficient
 func (s *Samples) AddRelation(s_line []string) error {
   one, two, phi := s_line[0], s_line[1], s_line[2]
 
@@ -53,6 +61,7 @@ func (s *Samples) AddRelation(s_line []string) error {
   return nil
 }
 
+// Ids returns a slice with all the samples available
 func (s *Samples) Ids() []string {
   var values []string
   for k, _ := range *s {
@@ -61,6 +70,7 @@ func (s *Samples) Ids() []string {
   return values
 }
 
+// AddSex adds the gender for a particular sample
 func (s *Samples) AddSex(s_line []string) error {
   id, sex := strings.Trim(s_line[0], " "), strings.Trim(s_line[1], " ")
 
@@ -77,6 +87,7 @@ func (s *Samples) AddSex(s_line []string) error {
   return nil
 }
 
+// AddPheno adds a phenotype for a particular sample
 func (s *Samples) AddPheno(s_line, s_header []string) error {
   id := strings.Trim(s_line[0], " ")
 
@@ -102,6 +113,8 @@ func (s *Samples) AddPheno(s_line, s_header []string) error {
   return nil
 }
 
+// ListPhenoTypes retuns a slice of all the phenotypes for
+// a particular sample
 func (s *Samples) ListPhenoTypes() []string {
   if len(*s) == 0 {
     return []string{}

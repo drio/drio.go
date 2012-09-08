@@ -1,3 +1,8 @@
+// Package urlness help us to find unrelated individuals in a population
+// ds.go holds all the datastructure
+// core.go holds the main algorithms
+// optimal_sets.go contains code to find the optimal subset of individuals
+// that are unrelated
 package urlness
 
 import (
@@ -8,10 +13,12 @@ import (
   "strings"
 )
 
-// signature for an action: what to do when we have a csv line ready to process
+// action is a signature for an action
+// what to do when we have a csv line ready to process
 type action func(m Samples, s_line, s_header []string) error
 
-// Iterates over a csv file and adds the data to the main datastructure
+// processFile iterates over a csv file and adds the data
+// to the main datastructure
 func processFile(m Samples, rf io.Reader, a action) {
   csv := csv.NewReader(rf)
   header := true
@@ -36,7 +43,7 @@ func processFile(m Samples, rf io.Reader, a action) {
   }
 }
 
-// Iterate over the list of samples in the main data structure (Samples) and
+// processData iterate over the list of samples in the main data structure (Samples) and
 // create the matrix of coefficients and list of unrelated samples.
 // This last one only if we are providing a Phi score.
 func processData(m Samples, o Options, listOnly map[string]bool) (string, string) {
@@ -77,13 +84,15 @@ func processData(m Samples, o Options, listOnly map[string]bool) (string, string
   return strings.Join(matrix, "\n"), strings.Join(unrelatedList, "\n")
 }
 
-// This is the struct that holds the info we use as entry point
+// Options holds the info we use as entry point
 // to this package
 type Options struct {
   KS, Sex, Phe, Only io.Reader // Data for all the files
   PhiFilter          float64   // What's the filter phi value
 }
 
+// ComputeOptimal is the entry point to use the optimal approach
+// for finding the best subset of animals in a population set
 func ComputeOptimal(o Options) string {
   var m Samples // Map of samples and its relation ships
   m.Init()      // Prepare data structure for data
@@ -108,7 +117,7 @@ func ComputeOptimal(o Options) string {
   return strings.Join(final, "\n")
 }
 
-// First entry point.
+// Compute is one of the two entry points to the package.
 // It computes the urlness and returns the matrix and the list (if possible)
 // It retuns the data in matrix and the list as a slice of bytes
 // This is the basic approach, per each individual, make sure the relateness
