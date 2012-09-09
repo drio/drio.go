@@ -115,6 +115,7 @@ func main() {
   inputData.PhiFilter = *o.phiFilter
 
   // CPU Profiling
+  // http://blog.golang.org/2011/06/profiling-go-programs.html
   if *o.cpuProfile != "" {
     f, err := os.Create(*o.cpuProfile)
     if err != nil {
@@ -122,17 +123,6 @@ func main() {
     }
     pprof.StartCPUProfile(f)
     defer pprof.StopCPUProfile()
-  }
-
-  // Mem profile
-  if *o.memProfile != "" {
-    f, err := os.Create(*o.memProfile)
-    if err != nil {
-      log.Fatal(err)
-    }
-    pprof.WriteHeapProfile(f)
-    f.Close()
-    return
   }
 
   // Run the appropiate routine
@@ -145,4 +135,16 @@ func main() {
       fmt.Fprintln(os.Stderr, l)
     }
   }
+
+  // Mem profile
+  // https://groups.google.com/forum/#!msg/golang-nuts/Nnp9HhLaJjA/y0yXlIDty0kJ
+  if *o.memProfile != "" {
+    f, err := os.Create(*o.memProfile)
+    if err != nil {
+      log.Fatal(err)
+    }
+    pprof.WriteHeapProfile(f)
+    defer f.Close()
+  }
+
 }
