@@ -6,7 +6,9 @@ import (
   "github.com/drio/drio.go/common/files"
   "github.com/drio/drio.go/urlness"
   "io"
+  "log"
   "os"
+  "runtime/pprof"
   "strings"
 )
 
@@ -41,6 +43,7 @@ type options struct {
   ksFname, sexFname, pheFname, onlyFname *string
   phiFilter                              *float64
   optimal                                *bool
+  cpuProfile, memProfile                 *string
 }
 
 func parseArgs() *options {
@@ -51,6 +54,9 @@ func parseArgs() *options {
   o.onlyFname = flag.String("only", "", "Gender csv file.")
   o.phiFilter = flag.Float64("phi", 0, "Maximum phi coefficient allowed.")
   o.optimal = flag.Bool("optimal", false, "Enable optimal.")
+  o.cpuProfile = flag.String("cpuprofile", "", "write cpu profile to file")
+  o.memProfile = flag.String("memprofile", "", "write mem profile to file")
+
   flag.Parse()
 
   // TODO: check that the file exists!!!!!!!!!!!!!!!!!!!!
@@ -108,6 +114,28 @@ func main() {
   // We know the Phi param has to be there for sure
   inputData.PhiFilter = *o.phiFilter
 
+  // CPU Profiling
+  if *o.cpuProfile != "" {
+    f, err := os.Create(*o.cpuProfile)
+    if err != nil {
+      log.Fatal(err)
+    }
+    pprof.StartCPUProfile(f)
+    defer pprof.StopCPUProfile()
+  }
+
+  // Mem profile
+  if *o.memProfile != "" {
+    f, err := os.Create(*o.memProfile)
+    if err != nil {
+      log.Fatal(err)
+    }
+    pprof.WriteHeapProfile(f)
+    f.Close()
+    return
+  }
+
+  // Run the appropiate routine
   if *o.optimal {
     fmt.Println(urlness.ComputeOptimal(*inputData))
   } else {
