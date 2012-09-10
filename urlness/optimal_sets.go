@@ -6,20 +6,6 @@ import (
 //"math/rand"
 )
 
-// pair Tuple that holds a sample name and the number of samples that
-// are related to it
-type pair struct {
-  name string
-  num  int
-}
-
-// pairList holds a list of pairs. And implements sort.Interface so
-// we can sort the list.
-type pairList []pair                  // This is really a set of pairs
-func (p pairList) Swap(i, j int)      { p[i], p[j] = p[j], p[i] }
-func (p pairList) Len() int           { return len(p) }
-func (p pairList) Less(i, j int) bool { return p[i].num < p[j].num }
-
 // findOptimalSet Given a set of samples, reduce it to the point it contains
 // only the maximum number of unrelated samples.
 // We also need the phi scores per each samle (m) and
