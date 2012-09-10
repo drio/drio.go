@@ -10,7 +10,9 @@ import (
   "fmt"
   "io"
   "log"
+  "math/rand"
   "strings"
+  "time"
 )
 
 // action is a signature for an action
@@ -108,6 +110,9 @@ func ComputeOptimal(o Options) string {
     set[e] = true
   }
 
+  // Prepare the seed for random
+  rand.Seed(time.Now().UTC().UnixNano())
+
   // Call the optimal routine and iterate over the elements in the results
   final := []string{}
   for e, _ := range findOptimalSet(set, m, o.PhiFilter) {
@@ -156,4 +161,25 @@ func Compute(o Options) (string, string) {
 
   matrix, list := processData(m, o, listOnly)
   return matrix, list
+}
+
+// GenRandomKindShip will create a random kinship file (string)
+func GenRandomKindShip(nSamples int) string {
+  // Prepare the seed for random
+  rand.Seed(time.Now().UTC().UnixNano())
+
+  ks := "ego1,ego2,phi\n" // header
+  for i := 0; i < nSamples; i++ {
+    for j := 0; j < nSamples; j++ {
+      if i == j {
+        ks += fmt.Sprintf("s_%d,s_%d,%f\n", i, j, 0.0)
+      } else {
+        if j > i {
+          ks += fmt.Sprintf("s_%d,s_%d,%f\n", i, j, float32(rand.Int31n(200))/float32(1000))
+        }
+      }
+    }
+  }
+
+  return ks
 }

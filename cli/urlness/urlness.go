@@ -21,11 +21,14 @@ var usage = []string{
   "  -ks   : csv file containing phi coefficients per each relation.",
   "",
   "Optional params: ",
-  "  -sex     : csv file containing samples' sex",
-  "  -phe     : csv file containing the gender of the samples",
-  "  -only    : only use this sample when filtering by phi score",
-  "  -phi     : maximum phi score allowed between relations",
-  "  -optimal : find the biggest subset of unrelated samples ",
+  "  -sex        <file> : csv file containing samples' sex",
+  "  -phe        <file> : csv file containing the gender of the samples",
+  "  -only       <file> : only use this sample when filtering by phi score",
+  "  -phi        <float>: maximum phi score allowed between relations",
+  "  -optimal           : find the biggest subset of unrelated samples ",
+  "  -rand       <int>  : generate random kinship file",
+  "  -cpuprofile <file> : dump cpu profiling data in file",
+  "  -memprofile <file> : dump mem profiling data in file",
   "",
   "Output:",
   "  stdin : csv matrix of phi coefficients for ALL the samples.",
@@ -44,6 +47,7 @@ type options struct {
   phiFilter                              *float64
   optimal                                *bool
   cpuProfile, memProfile                 *string
+  nRandSamples                           *int
 }
 
 func parseArgs() *options {
@@ -54,6 +58,7 @@ func parseArgs() *options {
   o.onlyFname = flag.String("only", "", "Gender csv file.")
   o.phiFilter = flag.Float64("phi", 0, "Maximum phi coefficient allowed.")
   o.optimal = flag.Bool("optimal", false, "Enable optimal.")
+  o.nRandSamples = flag.Int("rand", 0, "# of samples to generate")
   o.cpuProfile = flag.String("cpuprofile", "", "write cpu profile to file")
   o.memProfile = flag.String("memprofile", "", "write mem profile to file")
 
@@ -66,7 +71,7 @@ func parseArgs() *options {
     err = true
   }
 
-  if *o.ksFname == "" {
+  if *o.nRandSamples == 0 && *o.ksFname == "" {
     fmt.Fprintln(os.Stderr, "ERROR: Need kinship file")
     err = true
   }
@@ -91,6 +96,14 @@ func parseArgs() *options {
 
 func main() {
   o := parseArgs()
+
+  // If the user wants us to generate a random kindship file, let's do it
+  // and we are done
+  if *o.nRandSamples > 0 {
+    fmt.Print(urlness.GenRandomKindShip(*o.nRandSamples))
+    return
+  }
+
   inputData := new(urlness.Options)
 
   // link between file paths and their locations in the datastructure

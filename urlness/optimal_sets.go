@@ -1,7 +1,9 @@
 package urlness
 
 import (
-  "sort"
+//"sort"
+//"fmt"
+//"math/rand"
 )
 
 // pair Tuple that holds a sample name and the number of samples that
@@ -20,40 +22,48 @@ func (p pairList) Less(i, j int) bool { return p[i].num < p[j].num }
 
 // findOptimalSet Given a set of samples, reduce it to the point it contains
 // only the maximum number of unrelated samples.
-// We obviously also need the phi scores per each samle (m) and
+// We also need the phi scores per each samle (m) and
 // the phi score we want to use as a cut off
 func findOptimalSet(set map[string]bool, m Samples, phi float64) map[string]bool {
-
-  // Find the number of related samples for each of the samples in set
-  nOfRelated := make(map[string]int, len(set))
+  // Per all samples in set, I want to group animals together that have the
+  // same number of related animals
+  histRelated := make(map[int][]string)
   for e, _ := range set {
+    nOfRelated := 0
     for o, _ := range set {
       if m[e].Phis[o] > phi { // sample e is related to sample o
-        nOfRelated[e]++
+        nOfRelated++
       }
     }
+    histRelated[nOfRelated] = append(histRelated[nOfRelated], e)
   }
 
-  // convert the nOfRelated to a list of pairs and sort the
-  // list of pairs by value
-  pl := make(pairList, len(set))
-  i, sum := 0, 0
-  for e, n := range nOfRelated {
-    pl[i].name, pl[i].num = e, n
-    i++
-    sum += n
-  }
-  allZero := sum == 0 // All the elements in set are unrelated
-  sort.Sort(pl)
-
-  if allZero { // We found a subset where all the samples are unrelated
+  if len(histRelated[0]) == len(set) { // All elements in set are unrelated
     return set
   }
 
-  // We have samples in set that are related
-  // Delete from the set the sample with more related individuals
-  // If there is more than one, pick the one in the end of the sorted pl
-  delete(set, pl[len(set)-1].name)
+  max := 0 // key in histRelated for the animals with the highest number of relateness
+  for num, _ := range histRelated {
+    if num > max {
+      max = num
+    }
+  }
+
+  /*
+  	worseName, worseLen := "", len(set)
+  	for _, s := range histRelated[max] {
+  		delete(set, s)
+  		if lenCurrent := len(findOptimalSet(set, m, phi)); lenCurrent < worseLen {
+  			worseName, worseLen = s, lenCurrent
+  		}
+  		set[s] = true // Put it back, and try next
+  	}
+  	delete(set, worseName)
+  */
+
+  delete(set, histRelated[max][0])
+  //delete(set, histRelated[max][rand.Intn(len(histRelated[max]))])
+
   // .. and make a recursive call with the reduced set
   return findOptimalSet(set, m, phi)
 }
