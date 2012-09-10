@@ -170,13 +170,11 @@ func GenRandomKindShip(nSamples int) string {
 
   ks := "ego1,ego2,phi\n" // header
   for i := 0; i < nSamples; i++ {
-    for j := 0; j < nSamples; j++ {
+    for j := i; j < nSamples; j++ {
       if i == j {
         ks += fmt.Sprintf("s_%d,s_%d,%f\n", i, j, 0.0)
       } else {
-        if j > i {
-          ks += fmt.Sprintf("s_%d,s_%d,%f\n", i, j, float32(rand.Int31n(200))/float32(1000))
-        }
+        ks += fmt.Sprintf("s_%d,s_%d,%f\n", i, j, float32(rand.Int31n(200))/float32(1000))
       }
     }
   }
