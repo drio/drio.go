@@ -1,5 +1,6 @@
 #!/usr/bin/env ruby
 
+# TODO: the problem may not exist.
 def getDesc(n)
   start = false
   desc = []
@@ -11,6 +12,8 @@ def getDesc(n)
   desc.join("\n")
 end
 
+# Main
+#
 n = []
 Dir["p*"].each {|d| n << d.match(/(\d+)$/)[1]}
 nextNum = n.sort[-1].to_i + 1
