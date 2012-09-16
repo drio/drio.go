@@ -6,7 +6,7 @@ def getDesc(n)
   desc = []
   `lynx -dump http://projecteuler.net/problem=#{n}`.each_line do |l|
     start = true  if l =~ /^Problem\s/
-    start = false if l =~ /^References/
+    start = false if l =~ /Copyright Information$/
     desc << "// " + l.chomp if start
   end
   desc.join("\n")

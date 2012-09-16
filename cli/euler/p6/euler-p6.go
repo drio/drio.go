@@ -1,6 +1,7 @@
 package main
 
 import "fmt"
+
 //    The sum of the squares of the first ten natural numbers is,
 //    1^2 + 2^2 + ... + 10^2 = 385
 //
@@ -13,11 +14,11 @@ import "fmt"
 //    Find the difference between the sum of the squares of the first one
 //    hundred natural numbers and the square of the sum.
 func main() {
-	sum, square := 0, 0
-	for i:=1; i<=100; i++ {
-		sum += i*i
-		square += i
-	}
-	square *= square
-	fmt.Println(square-sum)
+  sum, square := 0, 0
+  for i := 1; i <= 100; i++ {
+    sum += i * i
+    square += i
+  }
+  square *= square
+  fmt.Println(square - sum)
 }
