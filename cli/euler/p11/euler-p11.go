@@ -1,10 +1,10 @@
 package main
 
 import (
-	"fmt"
-  "strings"
+  "fmt"
+  "log"
   "strconv"
-	"log"
+  "strings"
 )
 
 // In the 2020 grid below, four numbers along a diagonal line have been marked
@@ -37,47 +37,65 @@ const MAX_ROW = 20
 
 // loadMatrix loads the input data into a matrix
 func loadMatrix() [][]int {
-	var err error
-	m := make([][]int, MAX_ROW)
-	for r, line := range strings.Split(input, "\n") {
-		m[r] = make([]int, MAX_COL)
-		for c, digit := range strings.Split(line, " ") {
-			if m[r][c], err = strconv.Atoi(digit); err != nil {
-				log.Panic("ERROR converting string to int: ", m[r][c], ": ", err)
-			}
-		}
-	}
-	return m
+  var err error
+  m := make([][]int, MAX_ROW)
+  for r, line := range strings.Split(input, "\n") {
+    m[r] = make([]int, MAX_COL)
+    for c, digit := range strings.Split(line, " ") {
+      if m[r][c], err = strconv.Atoi(digit); err != nil {
+        log.Panic("ERROR converting string to int: ", m[r][c], ": ", err)
+      }
+    }
+  }
+  return m
 }
 
 // productIter iterates over all the products in matrix
 func productIter(m [][]int, ch chan int) {
-	for r:=0; r<len(m[0]); r++ {
-		for c:=0; c<len(m[0]); c++ {
-			// up, down
-			if r-3 >= 0                         { ch <- m[c][r-3] * m[c][r-2] * m[c][r-1] * m[c][r] }
-			if r+3 < MAX_ROW                    { ch <- m[c][r+3] * m[c][r+2] * m[c][r+1] * m[c][r] }
-			// left, right
-			if c-3 >= 0       								  { ch <- m[c-3][r] * m[c-2][r] * m[c-1][r] * m[c][r] }
-			if c+3 < MAX_COL                    { ch <- m[c+3][r] * m[c+2][r] * m[c+1][r] * m[c][r] }
-			// diagonal right
-			if c+3 < MAX_COL && r-3 >= 0        {	ch <- m[c+3][r-3] * m[c+2][r-2] * m[c+1][r-1] * m[c][r] }
-			if c-3 >= 0 && r+3 < MAX_ROW        {	ch <- m[c-3][r+3] * m[c-2][r+2] * m[c-1][r+1] * m[c][r] }
-			// diagonal left
-			if c-3 >= 0 && r-3 >= 0             {	ch <- m[c-3][r-3] * m[c-2][r-2] * m[c-1][r-1] * m[c][r] }
-			if c+3 < MAX_COL && r+3 < MAX_ROW   {	ch <- m[c+3][r+3] * m[c+2][r+2] * m[c+1][r+1] * m[c][r] }
-		}
-	}
-	close(ch)
+  for r := 0; r < len(m[0]); r++ {
+    for c := 0; c < len(m[0]); c++ {
+      // up, down
+      if r-3 >= 0 {
+        ch <- m[c][r-3] * m[c][r-2] * m[c][r-1] * m[c][r]
+      }
+      if r+3 < MAX_ROW {
+        ch <- m[c][r+3] * m[c][r+2] * m[c][r+1] * m[c][r]
+      }
+      // left, right
+      if c-3 >= 0 {
+        ch <- m[c-3][r] * m[c-2][r] * m[c-1][r] * m[c][r]
+      }
+      if c+3 < MAX_COL {
+        ch <- m[c+3][r] * m[c+2][r] * m[c+1][r] * m[c][r]
+      }
+      // diagonal right
+      if c+3 < MAX_COL && r-3 >= 0 {
+        ch <- m[c+3][r-3] * m[c+2][r-2] * m[c+1][r-1] * m[c][r]
+      }
+      if c-3 >= 0 && r+3 < MAX_ROW {
+        ch <- m[c-3][r+3] * m[c-2][r+2] * m[c-1][r+1] * m[c][r]
+      }
+      // diagonal left
+      if c-3 >= 0 && r-3 >= 0 {
+        ch <- m[c-3][r-3] * m[c-2][r-2] * m[c-1][r-1] * m[c][r]
+      }
+      if c+3 < MAX_COL && r+3 < MAX_ROW {
+        ch <- m[c+3][r+3] * m[c+2][r+2] * m[c+1][r+1] * m[c][r]
+      }
+    }
+  }
+  close(ch)
 }
 
 func main() {
-	m := loadMatrix()
+  m := loadMatrix()
   ch := make(chan int)
   go productIter(m, ch)
-	max := 0
-	for p := range ch {
-		if p > max { max = p }
-	}
-	fmt.Println(max)
+  max := 0
+  for p := range ch {
+    if p > max {
+      max = p
+    }
+  }
+  fmt.Println(max)
 }

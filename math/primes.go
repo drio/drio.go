@@ -58,3 +58,12 @@ func PrimeFactorsOf(n uint64) []uint64 {
 
   return primeFactors
 }
+
+// IsPrime tells you if a number is prime or not.
+func IsPrime(n uint64) bool {
+  pf := PrimeFactorsOf(n)
+  if len(pf) == 1 && pf[0] == n {
+    return true
+  }
+  return false
+}
