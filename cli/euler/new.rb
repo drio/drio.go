@@ -1,5 +1,5 @@
 #!/usr/bin/env ruby
-
+#
 # TODO: the problem may not exist.
 def getDesc(n)
   start = false
@@ -16,12 +16,13 @@ end
 #
 n = []
 Dir["p*"].each {|d| n << d.match(/(\d+)$/)[1]}
-nextNum = n.sort[-1].to_i + 1
+nextNum = n.map{|e| e.to_i }.sort[-1] + 1
 dir = "./p#{nextNum}"
 
 `mkdir #{dir}`
 File.open(dir + "/euler-p#{nextNum}.go", "w") do |f|
-  f.puts DATA.read.gsub(/__DESC__/, getDesc(nextNum))
+  #f.puts DATA.read.gsub(/__DESC__/, getDesc(nextNum))
+  f.puts DATA.read
 end
 
 __END__
