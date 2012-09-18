@@ -25,20 +25,20 @@ import "fmt"
 //    NOTE: Once the chain starts the terms are allowed to go above one
 //    million.
 func main() {
-	maxCount, max, i := uint64(0), uint64(0), uint64(0)
-	for i=999999; i>0; i-- {
-		count, n := uint64(0), i
-		for n>1 {
-			if n % 2 == 0 {
-				n = n/2
-			} else {
-				n = 3*n + 1
-			}
-			count+=1
-		}
-		if count > maxCount {
-			max, maxCount = i, count
-		}
-	}
-	fmt.Println(max)
+  maxCount, max, i := uint64(0), uint64(0), uint64(0)
+  for i = 999999; i > 0; i-- {
+    count, n := uint64(0), i
+    for n > 1 {
+      if n%2 == 0 {
+        n = n / 2
+      } else {
+        n = 3*n + 1
+      }
+      count += 1
+    }
+    if count > maxCount {
+      max, maxCount = i, count
+    }
+  }
+  fmt.Println(max)
 }

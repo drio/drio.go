@@ -1,8 +1,8 @@
 package main
 
 import (
-	"fmt"
-	"math"
+  "fmt"
+  "math"
 )
 
 // Problem 12
@@ -31,20 +31,20 @@ import (
 //    What is the value of the first triangle number to have over five
 //    hundred divisors?
 func main() {
-	var i,n uint64
-	n = 1
-	for true {
-		t := (n*(n+1))/2
-		nDiv := 0
-		for i=1; i<=uint64(math.Sqrt(float64(t))); i++ {
-			if t % i == 0 {
-				nDiv += 2
-				if nDiv == 500 {
-					fmt.Println(t)
-					return
-				}
-			}
-		}
-		n+=1
-	}
+  var i, n uint64
+  n = 1
+  for true {
+    t := (n * (n + 1)) / 2
+    nDiv := 0
+    for i = 1; i <= uint64(math.Sqrt(float64(t))); i++ {
+      if t%i == 0 {
+        nDiv += 2
+        if nDiv == 500 {
+          fmt.Println(t)
+          return
+        }
+      }
+    }
+    n += 1
+  }
 }
