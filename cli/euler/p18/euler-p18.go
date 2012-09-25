@@ -35,6 +35,8 @@ type triangle struct {
   data [][]int
 }
 
+// findMax solves the problem in O(n) n being the num of elments in the
+// base of the triangle.
 func findMax(t *triangle) int {
   for r := len(t.data) - 1; r > 0; r-- {
     for i, v := range t.data[r-1] {
