@@ -122,7 +122,7 @@ func ComputeOptimal(o Options) string {
   return strings.Join(final, "\n")
 }
 
-// Compute is one of the two entry points to the package.
+// Compute is one of the three entry points to the package.
 // It computes the urlness and returns the matrix and the list (if possible)
 // It retuns the data in matrix and the list as a slice of bytes
 // This is the basic approach, per each individual, make sure the relateness

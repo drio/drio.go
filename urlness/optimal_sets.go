@@ -11,8 +11,7 @@ import (
 // We also need the phi scores per each samle (m) and
 // the phi score we want to use as a cut off
 func findOptimalSet(set map[string]bool, m Samples, phi float64) map[string]bool {
-  // Per all samples in set, I want to group animals together that have the
-  // same number of related animals
+  // Per all samples in set, group them by the number of samples they relate to
   histRelated := make(map[int][]string)
   for e, _ := range set {
     nOfRelated := 0
@@ -28,7 +27,7 @@ func findOptimalSet(set map[string]bool, m Samples, phi float64) map[string]bool
     return set
   }
 
-  max := 0 // key in histRelated for the animals with the highest number of relateness
+  max := 0 // what's the group with more related animals?
   for num, _ := range histRelated {
     if num > max {
       max = num
@@ -36,15 +35,17 @@ func findOptimalSet(set map[string]bool, m Samples, phi float64) map[string]bool
   }
 
   /*
-  	worseName, worseLen := "", len(set)
-  	for _, s := range histRelated[max] {
-  		delete(set, s)
-  		if lenCurrent := len(findOptimalSet(set, m, phi)); lenCurrent < worseLen {
-  			worseName, worseLen = s, lenCurrent
-  		}
-  		set[s] = true // Put it back, and try next
-  	}
-  	delete(set, worseName)
+       // What's the sample I have to remove to get to the bigger set ?
+     	bestName, bestLen := "", 0
+     	for s, _ := range set {
+     		delete(set, s)
+     		if willGetMe := len(findOptimalSet(set, m, phi)); willGetMe > bestLen {
+     			bestName, bestLen = s, willGetMe
+     			//fmt.Println("  ", set, " -> (", bestLen, "," , bestName, ")")
+     		}
+     		set[s] = true // Put it back, and try next
+     	}
+     	delete(set, bestName)
   */
 
   delete(set, histRelated[max][0])
