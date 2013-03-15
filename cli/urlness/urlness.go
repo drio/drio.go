@@ -23,7 +23,7 @@ var usage = []string{
   "Optional params: ",
   "  -sex        <file> : csv file containing samples' sex",
   "  -phe        <file> : csv file containing the gender of the samples",
-  "  -only       <file> : only use this sample when filtering by phi score",
+  "  -only       <file> : only use these sample(s) when filtering by phi score",
   "  -phi        <float>: maximum phi score allowed between relations",
   "  -optimal           : find the biggest subset of unrelated samples ",
   "  -rand       <int>  : generate random kinship file",
