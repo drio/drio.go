@@ -108,6 +108,16 @@ func ComputeOptimal(o Options) string {
     return m.AddRelation(s_line)
   })
 
+	// Load (if necessary) the list of animals we want to include for sure in the
+	// final list
+  forceList := make(map[string]bool)
+  if o.Force != nil {
+    processFile(m, o.Force, func(m Samples, s_line, s_header []string) error {
+      forceList[strings.Trim(s_line[0], " ")] = true
+      return nil
+    })
+  }
+
   // Prepare a set with all the samples
   set := make(map[string]bool)
   for _, e := range m.Ids() {
@@ -119,7 +129,7 @@ func ComputeOptimal(o Options) string {
 
   // Call the optimal routine and iterate over the elements in the results
   final := []string{}
-  for e, _ := range findOptimalSet(set, m, o.PhiFilter) {
+  for e, _ := range findOptimalSet(set, m, o.PhiFilter, forceList) {
     final = append(final, e)
   }
 
@@ -148,7 +158,8 @@ func Compute(o Options) (string, string) {
     })
   }
 
-  // Load list of ids to use for phi comparison
+	// Load (if necessary) the list of animals we want to include for sure in the
+	// final list
   forceList := make(map[string]bool)
   if o.Force != nil {
     processFile(m, o.Force, func(m Samples, s_line, s_header []string) error {

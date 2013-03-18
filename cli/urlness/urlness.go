@@ -14,7 +14,7 @@ import (
 
 var usage = []string{
   //"urlness, a tool to find unrelated individuals.",
-  "urlness (v0.1b)",
+  "urlness (v0.1c)",
   "Usage: urlness -ks <kinship_file> [optional params]",
   "",
   "Madatory params: ",
