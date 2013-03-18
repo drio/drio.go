@@ -54,7 +54,7 @@ func processData(m Samples, o Options, forceList map[string]bool) (string, strin
   phiEnabled := o.PhiFilter != 0
   forceEnabled := false
   if len(forceList) > 0 {
-   	forceEnabled = true
+    forceEnabled = true
   }
 
   // Let's prepare the header for the matrix
@@ -65,20 +65,20 @@ func processData(m Samples, o Options, forceList map[string]bool) (string, strin
     line := append([]string{}, i)
     isUnrelated := true
 
-		if !forceList[i] { // If we want it in the list doesn't matter what, do not compute urlness
-			for _, j := range ids {
-				line = append(line, fmt.Sprintf("%f", m[i].Phis[j]))
-				if phiEnabled && i != j { // phi coef enabled
-					if forceEnabled {
-						if !forceList[j] { // only check for phi threshold for samples with ids not found in forceList
-							isUnrelated = isUnrelated && (m[i].Phis[j] <= o.PhiFilter)
-						}
-					} else { // Check phi coef against all ids
-						isUnrelated = isUnrelated && (m[i].Phis[j] <= o.PhiFilter)
-					}
-				}
-			}
-		}
+    if !forceList[i] { // If we want it in the list doesn't matter what, do not compute urlness
+      for _, j := range ids {
+        line = append(line, fmt.Sprintf("%f", m[i].Phis[j]))
+        if phiEnabled && i != j { // phi coef enabled
+          if forceEnabled {
+            if !forceList[j] { // only check for phi threshold for samples with ids not found in forceList
+              isUnrelated = isUnrelated && (m[i].Phis[j] <= o.PhiFilter)
+            }
+          } else { // Check phi coef against all ids
+            isUnrelated = isUnrelated && (m[i].Phis[j] <= o.PhiFilter)
+          }
+        }
+      }
+    }
 
     matrix = append(matrix, strings.Join(line, ","))
     if phiEnabled && isUnrelated { // Save as unrelated if passes phi coeff against the others
@@ -94,7 +94,7 @@ func processData(m Samples, o Options, forceList map[string]bool) (string, strin
 // to this package
 type Options struct {
   KS, Sex, Phe, Force io.Reader // Data for all the files
-  PhiFilter          float64   // What's the filter phi value
+  PhiFilter           float64   // What's the filter phi value
 }
 
 // ComputeOptimal is the entry point to use the optimal approach
@@ -108,8 +108,8 @@ func ComputeOptimal(o Options) string {
     return m.AddRelation(s_line)
   })
 
-	// Load (if necessary) the list of animals we want to include for sure in the
-	// final list
+  // Load (if necessary) the list of animals we want to include for sure in the
+  // final list
   forceList := make(map[string]bool)
   if o.Force != nil {
     processFile(m, o.Force, func(m Samples, s_line, s_header []string) error {
@@ -158,8 +158,8 @@ func Compute(o Options) (string, string) {
     })
   }
 
-	// Load (if necessary) the list of animals we want to include for sure in the
-	// final list
+  // Load (if necessary) the list of animals we want to include for sure in the
+  // final list
   forceList := make(map[string]bool)
   if o.Force != nil {
     processFile(m, o.Force, func(m Samples, s_line, s_header []string) error {

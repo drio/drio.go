@@ -108,10 +108,10 @@ func main() {
 
   // link between file paths and their locations in the datastructure
   // that we will pass to the urlness package (inputData)
-  fNamesToFiles := map[*string]*io.Reader {
-    o.ksFname:   &inputData.KS,
-    o.sexFname:  &inputData.Sex,
-    o.pheFname:  &inputData.Phe,
+  fNamesToFiles := map[*string]*io.Reader{
+    o.ksFname:    &inputData.KS,
+    o.sexFname:   &inputData.Sex,
+    o.pheFname:   &inputData.Phe,
     o.forceFname: &inputData.Force,
   }
 
