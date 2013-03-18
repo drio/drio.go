@@ -1,11 +1,5 @@
 package urlness
 
-import (
-//"sort"
-//"fmt"
-//"math/rand"
-)
-
 // findOptimalSet Given a set of samples, reduce it to the point it contains
 // only the maximum number of unrelated samples.
 // We also need the phi scores per each samle (m) and
@@ -22,18 +16,19 @@ func findOptimalSet(set map[string]bool,
   for e, _ := range set {
     nOfRelated := 0
     for o, _ := range set {
-      if m[e].Phis[o] > phi { // sample e is related to sample o
+			// Check of e and o are related only if o is not in the list of samples the user
+			// wants for sure in the final list
+      if !forceList[o] && m[e].Phis[o] > phi {
         nOfRelated++
       }
     }
-		if forceList[e] { // User wants e to be in the final list for sure
-			histRelated[0] = append(histRelated[nOfRelated], e)
-		} else {
-    	histRelated[nOfRelated] = append(histRelated[nOfRelated], e)
-		}
+   	histRelated[nOfRelated] = append(histRelated[nOfRelated], e)
   }
 
   if len(histRelated[0]) == len(set) { // All elements in set are unrelated
+		for e, _ := range(forceList) { // Add back the samples the user wants in the list for sure
+			set[e] = true
+		}
     return set
   }
 
