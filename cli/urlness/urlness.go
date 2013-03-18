@@ -14,7 +14,7 @@ import (
 
 var usage = []string{
   //"urlness, a tool to find unrelated individuals.",
-  "urlness (v0.1)",
+  "urlness (v0.1b)",
   "Usage: urlness -ks <kinship_file> [optional params]",
   "",
   "Madatory params: ",
@@ -23,7 +23,7 @@ var usage = []string{
   "Optional params: ",
   "  -sex        <file> : csv file containing samples' sex",
   "  -phe        <file> : csv file containing the gender of the samples",
-  "  -only       <file> : only use these sample(s) when filtering by phi score",
+  "  -force      <file> : include this animals in the final list without filtering (csv file)",
   "  -phi        <float>: maximum phi score allowed between relations",
   "  -optimal           : find the biggest subset of unrelated samples ",
   "  -rand       <int>  : generate random kinship file",
@@ -43,11 +43,11 @@ var usage = []string{
 
 // For processing the input parameters from the user.
 type options struct {
-  ksFname, sexFname, pheFname, onlyFname *string
-  phiFilter                              *float64
-  optimal                                *bool
-  cpuProfile, memProfile                 *string
-  nRandSamples                           *int
+  ksFname, sexFname, pheFname, forceFname *string
+  phiFilter                               *float64
+  optimal                                 *bool
+  cpuProfile, memProfile                  *string
+  nRandSamples                            *int
 }
 
 func parseArgs() *options {
@@ -55,7 +55,7 @@ func parseArgs() *options {
   o.ksFname = flag.String("ks", "", "Kinship csv file.")
   o.sexFname = flag.String("sex", "", "Gender csv file.")
   o.pheFname = flag.String("phe", "", "Gender csv file.")
-  o.onlyFname = flag.String("only", "", "Gender csv file.")
+  o.forceFname = flag.String("force", "", " csv file of samples we want to include for sure.")
   o.phiFilter = flag.Float64("phi", 0, "Maximum phi coefficient allowed.")
   o.optimal = flag.Bool("optimal", false, "Enable optimal.")
   o.nRandSamples = flag.Int("rand", 0, "# of samples to generate")
@@ -76,8 +76,8 @@ func parseArgs() *options {
     err = true
   }
 
-  if *o.onlyFname != "" && *o.phiFilter == 0 {
-    fmt.Fprintln(os.Stderr, "ERROR: -only requires -phi param")
+  if *o.forceFname != "" && *o.phiFilter == 0 {
+    fmt.Fprintln(os.Stderr, "ERROR: -force requires -phi param")
     err = true
   }
 
@@ -108,11 +108,11 @@ func main() {
 
   // link between file paths and their locations in the datastructure
   // that we will pass to the urlness package (inputData)
-  fNamesToFiles := map[*string]*io.Reader{
+  fNamesToFiles := map[*string]*io.Reader {
     o.ksFname:   &inputData.KS,
     o.sexFname:  &inputData.Sex,
     o.pheFname:  &inputData.Phe,
-    o.onlyFname: &inputData.Only,
+    o.forceFname: &inputData.Force,
   }
 
   // Open the files and set the readers for them in inputData

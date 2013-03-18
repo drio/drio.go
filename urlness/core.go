@@ -48,13 +48,13 @@ func processFile(m Samples, rf io.Reader, a action) {
 // processData iterate over the list of samples in the main data structure (Samples) and
 // create the matrix of coefficients and list of unrelated samples.
 // This last one only if we are providing a Phi score.
-func processData(m Samples, o Options, listOnly map[string]bool) (string, string) {
+func processData(m Samples, o Options, forceList map[string]bool) (string, string) {
   ids := m.Ids()
   unrelatedList := []string{} // List of animals that are unrelated based on phi coef.
   phiEnabled := o.PhiFilter != 0
-  onlyEnabled := false
-  if len(listOnly) > 0 {
-    onlyEnabled = true
+  forceEnabled := false
+  if len(forceList) > 0 {
+   	forceEnabled = true
   }
 
   // Let's prepare the header for the matrix
@@ -64,18 +64,22 @@ func processData(m Samples, o Options, listOnly map[string]bool) (string, string
   for _, i := range ids {
     line := append([]string{}, i)
     isUnrelated := true
-    for _, j := range ids {
-      line = append(line, fmt.Sprintf("%f", m[i].Phis[j]))
-      if phiEnabled && i != j { // phi coef enabled
-        if onlyEnabled {
-          if listOnly[j] { // only check for phi threshold for the ids in unrelatedList
-            isUnrelated = isUnrelated && (m[i].Phis[j] <= o.PhiFilter)
-          }
-        } else { // Check phi coef against all ids
-          isUnrelated = isUnrelated && (m[i].Phis[j] <= o.PhiFilter)
-        }
-      }
-    }
+
+		if !forceList[i] { // If we want it in the list doesn't matter what, do not compute urlness
+			for _, j := range ids {
+				line = append(line, fmt.Sprintf("%f", m[i].Phis[j]))
+				if phiEnabled && i != j { // phi coef enabled
+					if forceEnabled {
+						if !forceList[j] { // only check for phi threshold for samples with ids not found in forceList
+							isUnrelated = isUnrelated && (m[i].Phis[j] <= o.PhiFilter)
+						}
+					} else { // Check phi coef against all ids
+						isUnrelated = isUnrelated && (m[i].Phis[j] <= o.PhiFilter)
+					}
+				}
+			}
+		}
+
     matrix = append(matrix, strings.Join(line, ","))
     if phiEnabled && isUnrelated { // Save as unrelated if passes phi coeff against the others
       unrelatedList = append(unrelatedList, i)
@@ -89,7 +93,7 @@ func processData(m Samples, o Options, listOnly map[string]bool) (string, string
 // Options holds the info we use as entry point
 // to this package
 type Options struct {
-  KS, Sex, Phe, Only io.Reader // Data for all the files
+  KS, Sex, Phe, Force io.Reader // Data for all the files
   PhiFilter          float64   // What's the filter phi value
 }
 
@@ -145,10 +149,10 @@ func Compute(o Options) (string, string) {
   }
 
   // Load list of ids to use for phi comparison
-  listOnly := make(map[string]bool)
-  if o.Only != nil {
-    processFile(m, o.Only, func(m Samples, s_line, s_header []string) error {
-      listOnly[strings.Trim(s_line[0], " ")] = true
+  forceList := make(map[string]bool)
+  if o.Force != nil {
+    processFile(m, o.Force, func(m Samples, s_line, s_header []string) error {
+      forceList[strings.Trim(s_line[0], " ")] = true
       return nil
     })
   }
@@ -159,7 +163,7 @@ func Compute(o Options) (string, string) {
   })
   //fmt.Println(m["sample1"].Phis["sample2"])
 
-  matrix, list := processData(m, o, listOnly)
+  matrix, list := processData(m, o, forceList)
   return matrix, list
 }
 
