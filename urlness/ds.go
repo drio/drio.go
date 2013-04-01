@@ -130,3 +130,23 @@ func (s *Samples) ListPhenoTypes() []string {
 
   return slicePhenoTypes
 }
+
+// relateRemove return a list of animalas that are not related to the ones in
+// the force list
+func (s *Samples) RelateRemove(phi float64,
+  forceList map[string]bool) map[string]bool {
+
+  set := make(map[string]bool)
+  for e, _ := range *s { // input samples
+    num_related := 0
+    for k, _ := range forceList { // Animals in the force list
+      if (*s)[e].Phis[k] > phi { // is e related to k ?
+        num_related++
+      }
+    }
+    if len(forceList) == 0 || num_related != len(forceList) {
+      set[e] = true
+    }
+  }
+  return set
+}

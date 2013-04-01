@@ -16,8 +16,7 @@ func findOptimalSet(set map[string]bool,
   for e, _ := range set {
     nOfRelated := 0
     for o, _ := range set {
-      // Check of e and o are related only if o is not in the list of samples the user
-      // wants for sure in the final list
+      // Check if e and o are related only if not in the forcelist
       if !forceList[o] && m[e].Phis[o] > phi {
         nOfRelated++
       }

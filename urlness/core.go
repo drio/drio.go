@@ -119,10 +119,9 @@ func ComputeOptimal(o Options) string {
   }
 
   // Prepare a set with all the samples
+  // Drop the ones that are related to all the animals in the force list
   set := make(map[string]bool)
-  for _, e := range m.Ids() {
-    set[e] = true
-  }
+  set = m.RelateRemove(o.PhiFilter, forceList)
 
   // Prepare the seed for random
   rand.Seed(time.Now().UTC().UnixNano())
